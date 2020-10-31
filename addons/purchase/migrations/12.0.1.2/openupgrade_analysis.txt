@@ -2,8 +2,8 @@
 new model purchase.bill.union [sql_view]
 ---Fields in module 'purchase'---
 purchase     / account.invoice          / vendor_bill_purchase_id (many2one): NEW relation: purchase.bill.union
-purchase     / procurement.rule         / action (False)                : module is now 'purchase_stock' ('purchase')
-purchase     / procurement.rule         / action (False)                : selection_keys is now '['buy', 'manufacture', 'pull', 'pull_push', 'push']' ('['buy', 'manufacture', 'move']')
+purchase     / procurement.rule         / action (False)                : module is now 'mrp' ('purchase')
+purchase     / procurement.rule         / action (False)                : selection_keys is now '['manufacture', 'pull', 'pull_push', 'push']' ('['buy', 'move']')
 purchase     / product.template         / route_ids (False)             : module is now 'purchase_stock' ('purchase')
 purchase     / purchase.order           / access_token (char)           : NEW
 purchase     / purchase.order           / activity_date_deadline (date) : not related anymore

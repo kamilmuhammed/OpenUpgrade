@@ -78,7 +78,7 @@ NEW ir.model.access: product.access_product_template_manager
 DEL ir.model.access: product.access_product_attribute_line
 DEL ir.model.access: product.access_product_attribute_price
 DEL ir.model.access: product.access_product_uom_categ_user
-DEL ir.model.access: product.access_product_uom_user
+DEL ir.model.access: product.access_product_uom_user [renamed to ttm_hospital_management module]
 NEW ir.ui.view: product.product_packaging_tree_view2
 NEW ir.ui.view: product.product_supplierinfo_view_kanban
 NEW ir.ui.view: product.product_template_attribute_line_form
@@ -93,7 +93,7 @@ DEL ir.ui.view: product.product_attribute_value_view_tree
 DEL ir.ui.view: product.product_uom_categ_form_view
 DEL ir.ui.view: product.product_uom_form_view
 DEL ir.ui.view: product.product_uom_tree_view
-NEW product.category: product.cat_expense [renamed from hr_expense module] (noupdate)
+NEW product.category: product.cat_expense (noupdate)
 DEL product.uom: product.product_uom_cm [renamed to uom module] (noupdate)
 DEL product.uom: product.product_uom_day [renamed to uom module] (noupdate)
 DEL product.uom: product.product_uom_dozen [renamed to uom module] (noupdate)

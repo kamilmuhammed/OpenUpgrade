@@ -1,5 +1,43 @@
 ---Models in module 'sales_team'---
+new model crm.team
 ---Fields in module 'sales_team'---
-sales_team   / crm.team                 / message_last_post (datetime)  : DEL
+sales_team   / crm.team                 / active (boolean)              : NEW hasdefault
+sales_team   / crm.team                 / color (integer)               : NEW
+sales_team   / crm.team                 / company_id (many2one)         : NEW relation: res.company, hasdefault
+sales_team   / crm.team                 / dashboard_graph_group (selection): NEW selection_keys: ['day', 'month', 'user', 'week'], hasdefault
+sales_team   / crm.team                 / dashboard_graph_model (selection): NEW selection_keys: []
+sales_team   / crm.team                 / dashboard_graph_period (selection): NEW selection_keys: ['month', 'week', 'year'], hasdefault
+sales_team   / crm.team                 / favorite_user_ids (many2many) : NEW relation: res.users, hasdefault
+sales_team   / crm.team                 / member_ids (one2many)         : NEW relation: res.users
+sales_team   / crm.team                 / message_follower_ids (one2many): NEW relation: mail.followers
+sales_team   / crm.team                 / message_ids (one2many)        : NEW relation: mail.message
 sales_team   / crm.team                 / message_main_attachment_id (many2one): NEW relation: ir.attachment
+sales_team   / crm.team                 / name (char)                   : NEW required
+sales_team   / crm.team                 / reply_to (char)               : NEW
+sales_team   / crm.team                 / team_type (selection)         : NEW required, selection_keys: ['sales', 'website'], req_default: function, hasdefault
+sales_team   / crm.team                 / user_id (many2one)            : NEW relation: res.users
+sales_team   / crm.team                 / website_message_ids (one2many): NEW relation: mail.message
+sales_team   / res.partner              / team_id (many2one)            : NEW relation: crm.team
+sales_team   / res.users                / sale_team_id (many2one)       : NEW relation: crm.team
 ---XML records in module 'sales_team'---
+NEW crm.team: sales_team.salesteam_website_sales (noupdate)
+NEW crm.team: sales_team.team_sales_department (noupdate)
+NEW ir.actions.act_window: sales_team.crm_team_salesteams_act
+NEW ir.actions.act_window: sales_team.mail_activity_type_action_config_sales
+NEW ir.actions.act_window: sales_team.sales_team_config_action
+NEW ir.model.access: sales_team.access_crm_team
+NEW ir.model.access: sales_team.access_crm_team_manager
+NEW ir.model.access: sales_team.access_crm_team_user
+NEW ir.rule: sales_team.crm_rule_all_salesteam
+NEW ir.rule: sales_team.sale_team_comp_rule
+NEW ir.ui.menu: sales_team.menu_sale_config
+NEW ir.ui.view: sales_team.assets_backend
+NEW ir.ui.view: sales_team.crm_team_salesteams_search
+NEW ir.ui.view: sales_team.crm_team_salesteams_view_kanban
+NEW ir.ui.view: sales_team.crm_team_view_form
+NEW ir.ui.view: sales_team.crm_team_view_kanban
+NEW ir.ui.view: sales_team.crm_team_view_tree
+NEW res.groups: sales_team.group_sale_manager
+NEW res.groups: sales_team.group_sale_salesman
+NEW res.groups: sales_team.group_sale_salesman_all_leads
+NEW res.users: base.default_user (noupdate)

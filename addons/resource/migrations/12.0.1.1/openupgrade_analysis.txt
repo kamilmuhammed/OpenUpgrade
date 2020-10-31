@@ -1,11 +1,85 @@
 ---Models in module 'resource'---
+new model resource.calendar
+new model resource.calendar.attendance
+new model resource.calendar.leaves
+new model resource.mixin [abstract]
+new model resource.resource
+new model resource.test
 ---Fields in module 'resource'---
+resource     / res.company              / resource_calendar_id (many2one): NEW relation: resource.calendar
+resource     / res.company              / resource_calendar_ids (one2many): NEW relation: resource.calendar
+resource     / res.users                / resource_ids (one2many)       : NEW relation: resource.resource
+resource     / resource.calendar        / attendance_ids (one2many)     : NEW relation: resource.calendar.attendance, hasdefault
+resource     / resource.calendar        / company_id (many2one)         : NEW relation: res.company, hasdefault
+resource     / resource.calendar        / global_leave_ids (one2many)   : NEW relation: resource.calendar.leaves
 resource     / resource.calendar        / hours_per_day (float)         : NEW hasdefault
+resource     / resource.calendar        / leave_ids (one2many)          : NEW relation: resource.calendar.leaves
+resource     / resource.calendar        / name (char)                   : NEW required
 resource     / resource.calendar        / tz (selection)                : NEW required, selection_keys: function, req_default: function, hasdefault
+resource     / resource.calendar.attendance / calendar_id (many2one)        : NEW relation: resource.calendar, required
+resource     / resource.calendar.attendance / date_from (date)              : NEW
+resource     / resource.calendar.attendance / date_to (date)                : NEW
 resource     / resource.calendar.attendance / day_period (selection)        : NEW required, selection_keys: ['afternoon', 'morning'], req_default: function, hasdefault
+resource     / resource.calendar.attendance / dayofweek (selection)         : NEW required, selection_keys: ['0', '1', '2', '3', '4', '5', '6'], req_default: function, hasdefault
+resource     / resource.calendar.attendance / hour_from (float)             : NEW required
+resource     / resource.calendar.attendance / hour_to (float)               : NEW required
+resource     / resource.calendar.attendance / name (char)                   : NEW required
+resource     / resource.calendar.leaves / calendar_id (many2one)        : NEW relation: resource.calendar
+resource     / resource.calendar.leaves / company_id (many2one)         : NEW relation: res.company, isrelated: related, stored
+resource     / resource.calendar.leaves / date_from (datetime)          : NEW required
+resource     / resource.calendar.leaves / date_to (datetime)            : NEW required
+resource     / resource.calendar.leaves / name (char)                   : NEW
+resource     / resource.calendar.leaves / resource_id (many2one)        : NEW relation: resource.resource
 resource     / resource.calendar.leaves / time_type (selection)         : NEW selection_keys: ['leave', 'other'], hasdefault
-resource     / resource.calendar.leaves / tz (selection)                : DEL selection_keys: function
+resource     / resource.resource        / active (boolean)              : NEW hasdefault
+resource     / resource.resource        / calendar_id (many2one)        : NEW relation: resource.calendar, required, req_default: function, hasdefault
+resource     / resource.resource        / company_id (many2one)         : NEW relation: res.company, hasdefault
+resource     / resource.resource        / name (char)                   : NEW required
+resource     / resource.resource        / resource_type (selection)     : NEW required, selection_keys: ['material', 'user'], req_default: function, hasdefault
+resource     / resource.resource        / time_efficiency (float)       : NEW required, req_default: function, hasdefault
 resource     / resource.resource        / tz (selection)                : NEW required, selection_keys: function, req_default: function, hasdefault
-resource     / resource.test            / resource_calendar_id (many2one): is now stored
+resource     / resource.resource        / user_id (many2one)            : NEW relation: res.users
+resource     / resource.test            / company_id (many2one)         : NEW relation: res.company, hasdefault, isrelated: related, stored
+resource     / resource.test            / name (char)                   : NEW
+resource     / resource.test            / resource_calendar_id (many2one): NEW relation: resource.calendar, hasdefault, isrelated: related, stored
+resource     / resource.test            / resource_id (many2one)        : NEW relation: resource.resource, required
 ---XML records in module 'resource'---
+NEW ir.actions.act_window: resource.action_resource_calendar_form
+NEW ir.actions.act_window: resource.action_resource_calendar_leave_tree
+NEW ir.actions.act_window: resource.action_resource_resource_tree
+NEW ir.actions.act_window: resource.resource_calendar_closing_days
+NEW ir.actions.act_window: resource.resource_calendar_leaves_action_from_calendar
+NEW ir.actions.act_window: resource.resource_calendar_resources_leaves
+NEW ir.actions.act_window: resource.resource_resource_action_from_calendar
+NEW ir.model.access: resource.access_resource_calendar_attendance_system
+NEW ir.model.access: resource.access_resource_calendar_attendance_user
+NEW ir.model.access: resource.access_resource_calendar_leaves
+NEW ir.model.access: resource.access_resource_calendar_leaves_user
+NEW ir.model.access: resource.access_resource_calendar_system
+NEW ir.model.access: resource.access_resource_calendar_user
+NEW ir.model.access: resource.access_resource_resource
+NEW ir.model.access: resource.access_resource_resource_all
+NEW ir.model.access: resource.access_resource_test_all
 NEW ir.rule: resource.resource_calendar_leaves_rule_group_admin_modify (noupdate)
+NEW ir.rule: resource.resource_calendar_leaves_rule_group_user_create (noupdate)
+NEW ir.rule: resource.resource_calendar_leaves_rule_group_user_modify (noupdate)
+NEW ir.ui.menu: resource.menu_resource_calendar
+NEW ir.ui.menu: resource.menu_resource_config
+NEW ir.ui.menu: resource.menu_resource_resource
+NEW ir.ui.menu: resource.menu_view_resource_calendar_leaves_search
+NEW ir.ui.view: resource.resource_calendar_form
+NEW ir.ui.view: resource.resource_calendar_leave_form
+NEW ir.ui.view: resource.resource_calendar_leave_tree
+NEW ir.ui.view: resource.resource_resource_form
+NEW ir.ui.view: resource.resource_resource_tree
+NEW ir.ui.view: resource.view_resource_calendar
+NEW ir.ui.view: resource.view_resource_calendar_attendance_form
+NEW ir.ui.view: resource.view_resource_calendar_attendance_tree
+NEW ir.ui.view: resource.view_resource_calendar_leaves_search
+NEW ir.ui.view: resource.view_resource_calendar_search
+NEW ir.ui.view: resource.view_resource_calendar_tree
+NEW ir.ui.view: resource.view_resource_resource_search
+NEW res.company: base.main_company (noupdate)
+NEW resource.calendar: resource.resource_calendar_std
+NEW resource.calendar: resource.resource_calendar_std_35h (noupdate)
+NEW resource.calendar: resource.resource_calendar_std_38h (noupdate)

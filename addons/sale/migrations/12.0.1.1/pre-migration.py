@@ -96,6 +96,40 @@ def fill_sale_order_line_sections(cr):
     )
 
 
+def identify_act_window_views(env):
+    """Some action window views were previously declared directly from the
+    one2many field of the parent, not having XML-IDs. In this new version,
+    they are unfolded and given an XML-ID, provoking a constraint error as
+    you can't have several views of the same type. We assign that XML-IDs here
+    for solving the problems.
+    """
+    imd_obj = env['ir.model.data']
+    mapping = [
+        ('action_orders',
+         'sale_order_action_view_order_tree', 'tree'),
+        ('action_orders',
+         'sale_order_action_view_order_kanban', 'knaban'),
+        ('action_orders',
+         'sale_order_action_view_order_form', 'form'),
+        ('action_orders',
+         'sale_order_action_view_order_calendar', 'calendar'),
+        ('action_orders',
+         'sale_order_action_view_order_pivot', 'pivot'),
+        ('action_orders',
+         'sale_order_action_view_order_graph', 'graph'),
+    ]
+    for act_xml_id, xml_id, view_mode in mapping:
+        act_window = env.ref('sale.' + act_xml_id)
+        imd_obj.create({
+            'module': 'sale',
+            'name': xml_id,
+            'model': 'ir.actions.act_window.view',
+            'res_id': act_window.view_ids.filtered(
+                lambda x: x.view_mode == view_mode
+            ).id,
+        })
+
+
 @openupgrade.migrate()
 def migrate(env, version):
     openupgrade.copy_columns(env.cr, _column_copies)
@@ -110,6 +144,7 @@ def migrate(env, version):
         # from website_quote module
         openupgrade.rename_columns(env.cr, _column_renames2)
     fill_sale_order_line_sections(env.cr)
+    identify_act_window_views(env)
     openupgrade.logged_query(
         env.cr,
         "ALTER TABLE sale_order_line ADD COLUMN qty_delivered_method varchar",

@@ -1,19 +1,60 @@
 ---Models in module 'sale_stock'---
 ---Fields in module 'sale_stock'---
-sale_stock   / account.invoice          / incoterms_id (many2one)       : relation is now 'account.incoterms' ('stock.incoterms') [nothing to do]
-sale_stock   / sale.order               / effective_date (date)         : previously in module sale_order_dates
-sale_stock   / sale.order               / incoterm (many2one)           : relation is now 'account.incoterms' ('stock.incoterms') [nothing to do]
+sale_stock   / account.invoice          / incoterms_id (many2one)       : NEW relation: account.incoterms
+sale_stock   / procurement.group        / sale_id (many2one)            : NEW relation: sale.order
+sale_stock   / res.company              / security_lead (float)         : NEW required, req_default: function, hasdefault
+sale_stock   / sale.order               / effective_date (date)         : NEW isfunction: function, stored
+sale_stock   / sale.order               / incoterm (many2one)           : NEW relation: account.incoterms
+sale_stock   / sale.order               / picking_ids (one2many)        : NEW relation: stock.picking
+sale_stock   / sale.order               / picking_policy (selection)    : NEW required, selection_keys: ['direct', 'one'], req_default: function, hasdefault
+sale_stock   / sale.order               / procurement_group_id (many2one): NEW relation: procurement.group
+sale_stock   / sale.order               / warehouse_id (many2one)       : NEW relation: stock.warehouse, required, req_default: function, hasdefault
+sale_stock   / sale.order.line          / move_ids (one2many)           : NEW relation: stock.move
+sale_stock   / sale.order.line          / product_packaging (many2one)  : NEW relation: product.packaging, hasdefault
 sale_stock   / sale.order.line          / qty_delivered_method (False)  : NEW selection_keys: ['analytic', 'manual', 'stock_move'], mode: modify
+sale_stock   / sale.order.line          / route_id (many2one)           : NEW relation: stock.location.route
+sale_stock   / stock.location.route     / sale_selectable (boolean)     : NEW
+sale_stock   / stock.move               / sale_line_id (many2one)       : NEW relation: sale.order.line
+sale_stock   / stock.picking            / sale_id (many2one)            : NEW relation: sale.order, isrelated: related, stored
 ---XML records in module 'sale_stock'---
+NEW ir.model.access: sale_stock.access_account_journal
+NEW ir.model.access: sale_stock.access_account_partial_reconcile
+NEW ir.model.access: sale_stock.access_product_packaging_manager
+NEW ir.model.access: sale_stock.access_product_packaging_sale_manager
+NEW ir.model.access: sale_stock.access_product_packaging_user
+NEW ir.model.access: sale_stock.access_sale_order_line_stock_worker
+NEW ir.model.access: sale_stock.access_sale_order_stock_worker
+NEW ir.model.access: sale_stock.access_stock_location_sale_manager
+NEW ir.model.access: sale_stock.access_stock_location_user
+NEW ir.model.access: sale_stock.access_stock_move_manager
+NEW ir.model.access: sale_stock.access_stock_move_salesman
+NEW ir.model.access: sale_stock.access_stock_picking_sales
+NEW ir.model.access: sale_stock.access_stock_picking_salesman
 NEW ir.model.access: sale_stock.access_stock_rule
 NEW ir.model.access: sale_stock.access_stock_rule_salemanager
-DEL ir.model.access: sale_stock.access_procurement_rule
-DEL ir.model.access: sale_stock.access_procurement_rule_salemanager
-DEL ir.model.access: sale_stock.access_stock_location_path
-DEL ir.model.access: sale_stock.access_stock_location_path_sale_manager
+NEW ir.model.access: sale_stock.access_stock_warehouse_orderpoint_sale_salesman
+NEW ir.model.access: sale_stock.access_stock_warehouse_user
+NEW ir.rule: sale_stock.stock_picking_rule_portal
+NEW ir.ui.menu: sale_stock.menu_aftersale
+NEW ir.ui.menu: sale_stock.menu_invoiced
+NEW ir.ui.view: sale_stock.assets_backend
 NEW ir.ui.view: sale_stock.exception_on_picking
 NEW ir.ui.view: sale_stock.exception_on_so
+NEW ir.ui.view: sale_stock.invoice_form_inherit_sale_stock
+NEW ir.ui.view: sale_stock.product_template_view_form_inherit_sale
+NEW ir.ui.view: sale_stock.product_template_view_form_inherit_stock
+NEW ir.ui.view: sale_stock.report_delivery_document_inherit_sale_stock
+NEW ir.ui.view: sale_stock.report_invoice_document_inherit_sale_stock
+NEW ir.ui.view: sale_stock.report_saleorder_document_inherit_sale_stock
+NEW ir.ui.view: sale_stock.res_config_settings_view_form_sale
+NEW ir.ui.view: sale_stock.res_config_settings_view_form_stock
 NEW ir.ui.view: sale_stock.sale_order_portal_content_inherit_sale_stock
+NEW ir.ui.view: sale_stock.stock_location_route_view_form_inherit_sale_stock
 NEW ir.ui.view: sale_stock.stock_production_lot_view_form
 NEW ir.ui.view: sale_stock.stock_production_lot_view_form_simple
+NEW ir.ui.view: sale_stock.view_order_form_inherit_sale_stock
+NEW ir.ui.view: sale_stock.view_order_line_tree_inherit_sale_stock
 NEW ir.ui.view: sale_stock.view_stock_rules_report_sale
+NEW res.groups: sale_stock.group_display_incoterm
+NEW res.groups: sale_stock.group_route_so_lines
+NEW stock.location.route: stock.route_warehouse0_mto (noupdate)

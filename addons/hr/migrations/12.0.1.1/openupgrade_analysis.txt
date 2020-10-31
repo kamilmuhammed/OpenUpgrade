@@ -1,32 +1,150 @@
 ---Models in module 'hr'---
+new model hr.department
+new model hr.employee
+new model hr.employee.category
+new model hr.job
 ---Fields in module 'hr'---
-hr           / hr.department            / message_last_post (datetime)  : DEL
+hr           / hr.department            / active (boolean)              : NEW hasdefault
+hr           / hr.department            / child_ids (one2many)          : NEW relation: hr.department
+hr           / hr.department            / color (integer)               : NEW
+hr           / hr.department            / company_id (many2one)         : NEW relation: res.company, hasdefault
+hr           / hr.department            / complete_name (char)          : NEW isfunction: function, stored
+hr           / hr.department            / jobs_ids (one2many)           : NEW relation: hr.job
+hr           / hr.department            / manager_id (many2one)         : NEW relation: hr.employee
+hr           / hr.department            / member_ids (one2many)         : NEW relation: hr.employee
+hr           / hr.department            / message_follower_ids (one2many): NEW relation: mail.followers
+hr           / hr.department            / message_ids (one2many)        : NEW relation: mail.message
 hr           / hr.department            / message_main_attachment_id (many2one): NEW relation: ir.attachment
+hr           / hr.department            / name (char)                   : NEW required
+hr           / hr.department            / note (text)                   : NEW
+hr           / hr.department            / parent_id (many2one)          : NEW relation: hr.department
+hr           / hr.employee              / active (boolean)              : NEW hasdefault, isrelated: related, stored
 hr           / hr.employee              / activity_ids (one2many)       : NEW relation: mail.activity
 hr           / hr.employee              / additional_note (text)        : NEW
+hr           / hr.employee              / address_home_id (many2one)    : NEW relation: res.partner
+hr           / hr.employee              / address_id (many2one)         : NEW relation: res.partner
+hr           / hr.employee              / bank_account_id (many2one)    : NEW relation: res.partner.bank
+hr           / hr.employee              / birthday (date)               : NEW
+hr           / hr.employee              / category_ids (many2many)      : NEW relation: hr.employee.category
 hr           / hr.employee              / certificate (selection)       : NEW selection_keys: ['bachelor', 'master', 'other'], hasdefault
-hr           / hr.employee              / children (integer)            : previously in module hr_contract
+hr           / hr.employee              / child_ids (one2many)          : NEW relation: hr.employee
+hr           / hr.employee              / children (integer)            : NEW
+hr           / hr.employee              / coach_id (many2one)           : NEW relation: hr.employee
+hr           / hr.employee              / color (integer)               : NEW hasdefault
+hr           / hr.employee              / company_id (many2one)         : NEW relation: res.company, hasdefault, isrelated: related, stored
+hr           / hr.employee              / country_id (many2one)         : NEW relation: res.country
 hr           / hr.employee              / country_of_birth (many2one)   : NEW relation: res.country
+hr           / hr.employee              / department_id (many2one)      : NEW relation: hr.department
 hr           / hr.employee              / emergency_contact (char)      : NEW
 hr           / hr.employee              / emergency_phone (char)        : NEW
+hr           / hr.employee              / gender (selection)            : NEW selection_keys: ['female', 'male', 'other'], hasdefault
 hr           / hr.employee              / google_drive_link (char)      : NEW
+hr           / hr.employee              / identification_id (char)      : NEW
+hr           / hr.employee              / image (binary)                : NEW attachment: True, hasdefault
+hr           / hr.employee              / image_medium (binary)         : NEW attachment: True
+hr           / hr.employee              / image_small (binary)          : NEW attachment: True
+hr           / hr.employee              / job_id (many2one)             : NEW relation: hr.job
 hr           / hr.employee              / job_title (char)              : NEW
 hr           / hr.employee              / km_home_work (integer)        : NEW
-hr           / hr.employee              / message_last_post (datetime)  : DEL
+hr           / hr.employee              / marital (selection)           : NEW selection_keys: ['cohabitant', 'divorced', 'married', 'single', 'widower'], hasdefault
+hr           / hr.employee              / message_follower_ids (one2many): NEW relation: mail.followers
+hr           / hr.employee              / message_ids (one2many)        : NEW relation: mail.message
 hr           / hr.employee              / message_main_attachment_id (many2one): NEW relation: ir.attachment
-hr           / hr.employee              / place_of_birth (char)         : previously in module hr_contract
-hr           / hr.employee              / resource_calendar_id (many2one): is now stored
+hr           / hr.employee              / mobile_phone (char)           : NEW
+hr           / hr.employee              / name (char)                   : NEW isrelated: related, stored
+hr           / hr.employee              / notes (text)                  : NEW
+hr           / hr.employee              / parent_id (many2one)          : NEW relation: hr.employee
+hr           / hr.employee              / passport_id (char)            : NEW
+hr           / hr.employee              / permit_no (char)              : NEW
+hr           / hr.employee              / place_of_birth (char)         : NEW
+hr           / hr.employee              / resource_calendar_id (many2one): NEW relation: resource.calendar, hasdefault, isrelated: related, stored
+hr           / hr.employee              / resource_id (many2one)        : NEW relation: resource.resource, required
+hr           / hr.employee              / sinid (char)                  : NEW
 hr           / hr.employee              / spouse_birthdate (date)       : NEW
 hr           / hr.employee              / spouse_complete_name (char)   : NEW
+hr           / hr.employee              / ssnid (char)                  : NEW
 hr           / hr.employee              / study_field (char)            : NEW
 hr           / hr.employee              / study_school (char)           : NEW
-hr           / hr.employee              / user_id (many2one)            : is now stored
-hr           / hr.job                   / message_last_post (datetime)  : DEL
+hr           / hr.employee              / user_id (many2one)            : NEW relation: res.users, isrelated: related, stored
+hr           / hr.employee              / visa_expire (date)            : NEW
+hr           / hr.employee              / visa_no (char)                : NEW
+hr           / hr.employee              / work_email (char)             : NEW
+hr           / hr.employee              / work_location (char)          : NEW
+hr           / hr.employee              / work_phone (char)             : NEW
+hr           / hr.employee.category     / color (integer)               : NEW
+hr           / hr.employee.category     / employee_ids (many2many)      : NEW relation: hr.employee
+hr           / hr.employee.category     / name (char)                   : NEW required
+hr           / hr.job                   / company_id (many2one)         : NEW relation: res.company, hasdefault
+hr           / hr.job                   / department_id (many2one)      : NEW relation: hr.department
+hr           / hr.job                   / description (text)            : NEW
+hr           / hr.job                   / employee_ids (one2many)       : NEW relation: hr.employee
+hr           / hr.job                   / expected_employees (integer)  : NEW isfunction: function, stored
+hr           / hr.job                   / message_follower_ids (one2many): NEW relation: mail.followers
+hr           / hr.job                   / message_ids (one2many)        : NEW relation: mail.message
 hr           / hr.job                   / message_main_attachment_id (many2one): NEW relation: ir.attachment
+hr           / hr.job                   / name (char)                   : NEW required
+hr           / hr.job                   / no_of_employee (integer)      : NEW isfunction: function, stored
+hr           / hr.job                   / no_of_hired_employee (integer): NEW
+hr           / hr.job                   / no_of_recruitment (integer)   : NEW hasdefault
+hr           / hr.job                   / requirements (text)           : NEW
+hr           / hr.job                   / state (selection)             : NEW required, selection_keys: ['open', 'recruit'], req_default: function, hasdefault
+hr           / mail.alias               / alias_contact (False)         : NEW selection_keys: ['employees', 'everyone', 'followers', 'partners'], mode: modify
 hr           / mail.channel             / subscription_department_ids (many2many): NEW relation: hr.department
+hr           / res.users                / employee_ids (one2many)       : NEW relation: hr.employee
 ---XML records in module 'hr'---
+NEW hr.department: hr.dep_administration (noupdate)
+NEW hr.department: hr.dep_sales (noupdate)
 NEW hr.employee: hr.employee_admin (noupdate)
-DEL hr.employee: hr.employee_root (noupdate)
+NEW ir.actions.act_window: hr.act_employee_from_department
+NEW ir.actions.act_window: hr.action_hr_job
+NEW ir.actions.act_window: hr.hr_config_settings_action
+NEW ir.actions.act_window: hr.hr_employee_action_subordinate_hierachy
+NEW ir.actions.act_window: hr.open_module_tree_department
+NEW ir.actions.act_window: hr.open_view_categ_form
+NEW ir.actions.act_window: hr.open_view_employee_list
+NEW ir.actions.act_window: hr.open_view_employee_list_my
+NEW ir.actions.act_window: hr.open_view_employee_tree
+NEW ir.model.access: hr.access_hr_department_employee
+NEW ir.model.access: hr.access_hr_department_user
+NEW ir.model.access: hr.access_hr_employee_category_emp
+NEW ir.model.access: hr.access_hr_employee_category_user
+NEW ir.model.access: hr.access_hr_employee_resource_user
+NEW ir.model.access: hr.access_hr_employee_system_user
+NEW ir.model.access: hr.access_hr_employee_user
+NEW ir.model.access: hr.access_hr_job_user
+NEW ir.model.access: hr.access_ir_property_hr_user
+NEW ir.rule: hr.hr_dept_comp_rule (noupdate)
 NEW ir.rule: hr.hr_employee_comp_rule (noupdate)
+NEW ir.rule: hr.hr_job_comp_rule (noupdate)
+NEW ir.ui.menu: hr.hr_menu_configuration
+NEW ir.ui.menu: hr.menu_hr_department_tree
+NEW ir.ui.menu: hr.menu_hr_main
+NEW ir.ui.menu: hr.menu_hr_reporting_timesheet
+NEW ir.ui.menu: hr.menu_hr_root
+NEW ir.ui.menu: hr.menu_human_resources_configuration
+NEW ir.ui.menu: hr.menu_open_view_employee_list_my
+NEW ir.ui.menu: hr.menu_view_employee_category_form
+NEW ir.ui.menu: hr.menu_view_hr_job
+NEW ir.ui.view: hr.assets_backend
+NEW ir.ui.view: hr.hr_department_view_kanban
+NEW ir.ui.view: hr.hr_job_view_kanban
+NEW ir.ui.view: hr.hr_kanban_view_employees
 NEW ir.ui.view: hr.mail_channel_view_form_
+NEW ir.ui.view: hr.res_config_settings_view_form
+NEW ir.ui.view: hr.view_department_filter
+NEW ir.ui.view: hr.view_department_form
+NEW ir.ui.view: hr.view_department_tree
+NEW ir.ui.view: hr.view_employee_category_form
+NEW ir.ui.view: hr.view_employee_category_list
+NEW ir.ui.view: hr.view_employee_filter
+NEW ir.ui.view: hr.view_employee_form
+NEW ir.ui.view: hr.view_employee_tree
+NEW ir.ui.view: hr.view_hr_job_form
+NEW ir.ui.view: hr.view_hr_job_tree
+NEW ir.ui.view: hr.view_job_filter
+NEW ir.ui.view: hr.view_partner_tree2
 NEW ir.ui.view: hr.view_users_form_simple_modif_resource
+NEW mail.template: hr.mail_template_data_unknown_employee_email_address (noupdate)
+NEW res.groups: hr.group_hr_manager
+NEW res.groups: hr.group_hr_user
+NEW res.users: base.default_user (noupdate)

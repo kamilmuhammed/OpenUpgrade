@@ -1,5 +1,55 @@
 ---Models in module 'hr_attendance'---
+new model hr.attendance
 ---Fields in module 'hr_attendance'---
-hr_attendance / hr.employee              / last_attendance_id (many2one) : is now stored
+hr_attendance / hr.attendance            / check_in (datetime)           : NEW required, req_default: function, hasdefault
+hr_attendance / hr.attendance            / check_out (datetime)          : NEW
+hr_attendance / hr.attendance            / employee_id (many2one)        : NEW relation: hr.employee, required, req_default: function, hasdefault
+hr_attendance / hr.attendance            / worked_hours (float)          : NEW isfunction: function, stored
+hr_attendance / hr.employee              / attendance_ids (one2many)     : NEW relation: hr.attendance
+hr_attendance / hr.employee              / barcode (char)                : NEW hasdefault
+hr_attendance / hr.employee              / last_attendance_id (many2one) : NEW relation: hr.attendance, isfunction: function, stored
+hr_attendance / hr.employee              / pin (char)                    : NEW hasdefault
 ---XML records in module 'hr_attendance'---
+NEW ir.actions.act_window: hr_attendance.action_hr_attendance_settings
+NEW ir.actions.act_window: hr_attendance.hr_attendance_action
+NEW ir.actions.act_window: hr_attendance.hr_attendance_action_employee
+NEW ir.actions.act_window: hr_attendance.hr_attendance_action_graph
+NEW ir.actions.act_window: hr_attendance.hr_attendance_action_graph_filtered
+NEW ir.actions.act_window: hr_attendance.hr_employee_attendance_action_kanban
+NEW ir.actions.client: hr_attendance.hr_attendance_action_greeting_message
+NEW ir.actions.client: hr_attendance.hr_attendance_action_kiosk_mode
+NEW ir.actions.client: hr_attendance.hr_attendance_action_my_attendances
+NEW ir.actions.report: hr_attendance.hr_employee_print_badge
+NEW ir.model.access: hr_attendance.access_hr_attendance_system_user
+NEW ir.model.access: hr_attendance.access_hr_attendance_user
+NEW ir.rule: hr_attendance.hr_attendance_rule_attendance_employee (noupdate)
+NEW ir.rule: hr_attendance.hr_attendance_rule_attendance_manager (noupdate)
+NEW ir.rule: hr_attendance.hr_attendance_rule_employee_company (noupdate)
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_kiosk_mode
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_manage_attendances
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_my_attendances
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_report
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_root
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_settings
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_view_attendances
+NEW ir.ui.menu: hr_attendance.menu_hr_attendance_view_employees_kanban
+NEW ir.ui.view: hr_attendance.assets_backend
+NEW ir.ui.view: hr_attendance.hr_attendance_view_filter
+NEW ir.ui.view: hr_attendance.hr_attendance_view_form
+NEW ir.ui.view: hr_attendance.hr_attendance_view_graph
+NEW ir.ui.view: hr_attendance.hr_attendance_view_pivot
+NEW ir.ui.view: hr_attendance.hr_department_view_kanban
+NEW ir.ui.view: hr_attendance.hr_employees_view_kanban
+NEW ir.ui.view: hr_attendance.print_employee_badge
+NEW ir.ui.view: hr_attendance.qunit_suite
+NEW ir.ui.view: hr_attendance.res_config_settings_view_form
+NEW ir.ui.view: hr_attendance.view_attendance_tree
 NEW ir.ui.view: hr_attendance.view_employee_filter_inherit_hr_attendance
+NEW ir.ui.view: hr_attendance.view_employee_form_inherit_hr_attendance
+NEW ir.ui.view: hr_attendance.view_employee_kanban_inherit_hr_attendance
+NEW ir.ui.view: hr_attendance.view_hr_attendance_kanban
+NEW res.groups: hr_attendance.group_hr_attendance
+NEW res.groups: hr_attendance.group_hr_attendance_manager
+NEW res.groups: hr_attendance.group_hr_attendance_use_pin
+NEW res.groups: hr_attendance.group_hr_attendance_user
+NEW res.users: base.default_user (noupdate)

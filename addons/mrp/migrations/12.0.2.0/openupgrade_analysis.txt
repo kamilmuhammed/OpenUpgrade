@@ -1,50 +1,217 @@
 ---Models in module 'mrp'---
-obsolete model mrp.message
-obsolete model report.mrp.mrp_bom_cost_report [abstract]
-obsolete model report.mrp.mrp_bom_structure_report [abstract]
+new model change.production.qty [transient]
+new model mrp.bom
+new model mrp.bom.line
+new model mrp.document
+new model mrp.product.produce [transient]
+new model mrp.product.produce.line [transient]
+new model mrp.production
+new model mrp.routing
+new model mrp.routing.workcenter
+new model mrp.unbuild
+new model mrp.workcenter
+new model mrp.workcenter.productivity
+new model mrp.workcenter.productivity.loss
 new model mrp.workcenter.productivity.loss.type
+new model mrp.workorder
 new model report.mrp.report_bom_structure [abstract]
+new model stock.warn.insufficient.qty.unbuild [transient]
 ---Fields in module 'mrp'---
-mrp          / mrp.bom                  / message_last_post (datetime)  : DEL
+mrp          / mrp.bom                  / active (boolean)              : NEW hasdefault
+mrp          / mrp.bom                  / bom_line_ids (one2many)       : NEW relation: mrp.bom.line
+mrp          / mrp.bom                  / code (char)                   : NEW
+mrp          / mrp.bom                  / company_id (many2one)         : NEW relation: res.company, required, req_default: function, hasdefault
+mrp          / mrp.bom                  / message_follower_ids (one2many): NEW relation: mail.followers
+mrp          / mrp.bom                  / message_ids (one2many)        : NEW relation: mail.message
 mrp          / mrp.bom                  / message_main_attachment_id (many2one): NEW relation: ir.attachment
-mrp          / mrp.bom                  / product_uom_id (many2one)     : relation is now 'uom.uom' ('product.uom') [nothing to do]
-mrp          / mrp.bom.line             / product_uom_id (many2one)     : relation is now 'uom.uom' ('product.uom') [nothing to do]
-mrp          / mrp.message              / bom_id (many2one)             : DEL relation: mrp.bom
-mrp          / mrp.message              / message (html)                : DEL required
-mrp          / mrp.message              / name (text)                   : DEL
-mrp          / mrp.message              / product_id (many2one)         : DEL relation: product.product
-mrp          / mrp.message              / product_tmpl_id (many2one)    : DEL relation: product.template
-mrp          / mrp.message              / routing_id (many2one)         : DEL relation: mrp.routing
-mrp          / mrp.message              / valid_until (date)            : DEL required, req_default: function
-mrp          / mrp.message              / workcenter_id (many2one)      : DEL relation: mrp.workcenter
-mrp          / mrp.production           / activity_date_deadline (date) : not related anymore
-mrp          / mrp.production           / activity_date_deadline (date) : not stored anymore
-mrp          / mrp.production           / activity_date_deadline (date) : now a function
-mrp          / mrp.production           / message_last_post (datetime)  : DEL
+mrp          / mrp.bom                  / picking_type_id (many2one)    : NEW relation: stock.picking.type
+mrp          / mrp.bom                  / product_id (many2one)         : NEW relation: product.product
+mrp          / mrp.bom                  / product_qty (float)           : NEW required, req_default: function, hasdefault
+mrp          / mrp.bom                  / product_tmpl_id (many2one)    : NEW relation: product.template, required
+mrp          / mrp.bom                  / product_uom_id (many2one)     : NEW relation: uom.uom, required, req_default: function, hasdefault
+mrp          / mrp.bom                  / ready_to_produce (selection)  : NEW required, selection_keys: ['all_available', 'asap'], req_default: function, hasdefault
+mrp          / mrp.bom                  / routing_id (many2one)         : NEW relation: mrp.routing
+mrp          / mrp.bom                  / sequence (integer)            : NEW
+mrp          / mrp.bom                  / type (selection)              : NEW required, selection_keys: ['normal', 'phantom'], req_default: function, hasdefault
+mrp          / mrp.bom                  / website_message_ids (one2many): NEW relation: mail.message
+mrp          / mrp.bom.line             / attribute_value_ids (many2many): NEW relation: product.attribute.value
+mrp          / mrp.bom.line             / bom_id (many2one)             : NEW relation: mrp.bom, required
+mrp          / mrp.bom.line             / operation_id (many2one)       : NEW relation: mrp.routing.workcenter
+mrp          / mrp.bom.line             / product_id (many2one)         : NEW relation: product.product, required
+mrp          / mrp.bom.line             / product_qty (float)           : NEW required, req_default: function, hasdefault
+mrp          / mrp.bom.line             / product_uom_id (many2one)     : NEW relation: uom.uom, required, req_default: function, hasdefault
+mrp          / mrp.bom.line             / routing_id (many2one)         : NEW relation: mrp.routing, isrelated: related, stored
+mrp          / mrp.bom.line             / sequence (integer)            : NEW hasdefault
+mrp          / mrp.document             / _inherits (False)             : NEW
+mrp          / mrp.document             / active (boolean)              : NEW hasdefault
+mrp          / mrp.document             / ir_attachment_id (many2one)   : NEW relation: ir.attachment, required
+mrp          / mrp.document             / priority (selection)          : NEW selection_keys: ['0', '1', '2', '3']
+mrp          / mrp.production           / activity_ids (one2many)       : NEW relation: mail.activity
+mrp          / mrp.production           / availability (selection)      : NEW selection_keys: ['assigned', 'none', 'partially_available', 'waiting'], isfunction: function, stored
+mrp          / mrp.production           / bom_id (many2one)             : NEW relation: mrp.bom
+mrp          / mrp.production           / company_id (many2one)         : NEW relation: res.company, required, req_default: function, hasdefault
+mrp          / mrp.production           / date_finished (datetime)      : NEW
+mrp          / mrp.production           / date_planned_finished (datetime): NEW hasdefault
+mrp          / mrp.production           / date_planned_start (datetime) : NEW required, req_default: function, hasdefault
+mrp          / mrp.production           / date_start (datetime)         : NEW
+mrp          / mrp.production           / is_locked (boolean)           : NEW hasdefault
+mrp          / mrp.production           / location_dest_id (many2one)   : NEW relation: stock.location, required, req_default: function, hasdefault
+mrp          / mrp.production           / location_src_id (many2one)    : NEW relation: stock.location, required, req_default: function, hasdefault
+mrp          / mrp.production           / message_follower_ids (one2many): NEW relation: mail.followers
+mrp          / mrp.production           / message_ids (one2many)        : NEW relation: mail.message
 mrp          / mrp.production           / message_main_attachment_id (many2one): NEW relation: ir.attachment
-mrp          / mrp.production           / product_uom_id (many2one)     : relation is now 'uom.uom' ('product.uom') [nothing to do]
+mrp          / mrp.production           / move_dest_ids (one2many)      : NEW relation: stock.move
+mrp          / mrp.production           / move_finished_ids (one2many)  : NEW relation: stock.move
+mrp          / mrp.production           / move_raw_ids (one2many)       : NEW relation: stock.move
+mrp          / mrp.production           / name (char)                   : NEW hasdefault
+mrp          / mrp.production           / origin (char)                 : NEW
+mrp          / mrp.production           / picking_type_id (many2one)    : NEW relation: stock.picking.type, required, req_default: function, hasdefault
+mrp          / mrp.production           / priority (selection)          : NEW selection_keys: ['0', '1', '2', '3'], hasdefault
+mrp          / mrp.production           / procurement_group_id (many2one): NEW relation: procurement.group
+mrp          / mrp.production           / product_id (many2one)         : NEW relation: product.product, required
+mrp          / mrp.production           / product_qty (float)           : NEW required, req_default: function, hasdefault
+mrp          / mrp.production           / product_uom_id (many2one)     : NEW relation: uom.uom, required
 mrp          / mrp.production           / product_uom_qty (float)       : NEW isfunction: function, stored
-mrp          / mrp.unbuild              / activity_date_deadline (date) : not related anymore
-mrp          / mrp.unbuild              / activity_date_deadline (date) : not stored anymore
-mrp          / mrp.unbuild              / activity_date_deadline (date) : now a function
-mrp          / mrp.unbuild              / message_last_post (datetime)  : DEL
+mrp          / mrp.production           / propagate (boolean)           : NEW
+mrp          / mrp.production           / routing_id (many2one)         : NEW relation: mrp.routing, isfunction: function, stored
+mrp          / mrp.production           / scrap_ids (one2many)          : NEW relation: stock.scrap
+mrp          / mrp.production           / state (selection)             : NEW selection_keys: ['cancel', 'confirmed', 'done', 'planned', 'progress'], hasdefault
+mrp          / mrp.production           / user_id (many2one)            : NEW relation: res.users, hasdefault
+mrp          / mrp.production           / website_message_ids (one2many): NEW relation: mail.message
+mrp          / mrp.production           / workorder_ids (one2many)      : NEW relation: mrp.workorder
+mrp          / mrp.routing              / active (boolean)              : NEW hasdefault
+mrp          / mrp.routing              / code (char)                   : NEW hasdefault
+mrp          / mrp.routing              / company_id (many2one)         : NEW relation: res.company, hasdefault
+mrp          / mrp.routing              / location_id (many2one)        : NEW relation: stock.location
+mrp          / mrp.routing              / name (char)                   : NEW required
+mrp          / mrp.routing              / note (text)                   : NEW
+mrp          / mrp.routing              / operation_ids (one2many)      : NEW relation: mrp.routing.workcenter
+mrp          / mrp.routing.workcenter   / batch (selection)             : NEW required, selection_keys: ['no', 'yes'], req_default: function, hasdefault
+mrp          / mrp.routing.workcenter   / batch_size (float)            : NEW hasdefault
+mrp          / mrp.routing.workcenter   / company_id (many2one)         : NEW relation: res.company, isrelated: related, stored
+mrp          / mrp.routing.workcenter   / name (char)                   : NEW required
+mrp          / mrp.routing.workcenter   / note (text)                   : NEW
+mrp          / mrp.routing.workcenter   / routing_id (many2one)         : NEW relation: mrp.routing, required
+mrp          / mrp.routing.workcenter   / sequence (integer)            : NEW hasdefault
+mrp          / mrp.routing.workcenter   / time_cycle_manual (float)     : NEW hasdefault
+mrp          / mrp.routing.workcenter   / time_mode (selection)         : NEW selection_keys: ['auto', 'manual'], hasdefault
+mrp          / mrp.routing.workcenter   / time_mode_batch (integer)     : NEW hasdefault
+mrp          / mrp.routing.workcenter   / workcenter_id (many2one)      : NEW relation: mrp.workcenter, required
+mrp          / mrp.routing.workcenter   / workorder_ids (one2many)      : NEW relation: mrp.workorder
+mrp          / mrp.routing.workcenter   / worksheet (binary)            : NEW attachment: False
+mrp          / mrp.unbuild              / activity_ids (one2many)       : NEW relation: mail.activity
+mrp          / mrp.unbuild              / bom_id (many2one)             : NEW relation: mrp.bom, required
+mrp          / mrp.unbuild              / consume_line_ids (one2many)   : NEW relation: stock.move
+mrp          / mrp.unbuild              / location_dest_id (many2one)   : NEW relation: stock.location, required, req_default: function, hasdefault
+mrp          / mrp.unbuild              / location_id (many2one)        : NEW relation: stock.location, required, req_default: function, hasdefault
+mrp          / mrp.unbuild              / lot_id (many2one)             : NEW relation: stock.production.lot
+mrp          / mrp.unbuild              / message_follower_ids (one2many): NEW relation: mail.followers
+mrp          / mrp.unbuild              / message_ids (one2many)        : NEW relation: mail.message
 mrp          / mrp.unbuild              / message_main_attachment_id (many2one): NEW relation: ir.attachment
-mrp          / mrp.unbuild              / product_uom_id (many2one)     : relation is now 'uom.uom' ('product.uom') [nothing to do]
+mrp          / mrp.unbuild              / mo_id (many2one)              : NEW relation: mrp.production
+mrp          / mrp.unbuild              / name (char)                   : NEW hasdefault
+mrp          / mrp.unbuild              / produce_line_ids (one2many)   : NEW relation: stock.move
+mrp          / mrp.unbuild              / product_id (many2one)         : NEW relation: product.product, required
+mrp          / mrp.unbuild              / product_qty (float)           : NEW required, req_default: function, hasdefault
+mrp          / mrp.unbuild              / product_uom_id (many2one)     : NEW relation: uom.uom, required
+mrp          / mrp.unbuild              / state (selection)             : NEW selection_keys: ['done', 'draft'], hasdefault
+mrp          / mrp.unbuild              / website_message_ids (one2many): NEW relation: mail.message
+mrp          / mrp.workcenter           / active (boolean)              : NEW hasdefault, isrelated: related, stored
+mrp          / mrp.workcenter           / capacity (float)              : NEW hasdefault
+mrp          / mrp.workcenter           / code (char)                   : NEW
+mrp          / mrp.workcenter           / color (integer)               : NEW
+mrp          / mrp.workcenter           / company_id (many2one)         : NEW relation: res.company, hasdefault, isrelated: related, stored
 mrp          / mrp.workcenter           / costs_hour (float)            : NEW hasdefault
-mrp          / mrp.workcenter           / resource_calendar_id (many2one): is now stored
+mrp          / mrp.workcenter           / name (char)                   : NEW isrelated: related, stored
+mrp          / mrp.workcenter           / note (text)                   : NEW
+mrp          / mrp.workcenter           / oee_target (float)            : NEW hasdefault
+mrp          / mrp.workcenter           / order_ids (one2many)          : NEW relation: mrp.workorder
+mrp          / mrp.workcenter           / resource_calendar_id (many2one): NEW relation: resource.calendar, hasdefault, isrelated: related, stored
+mrp          / mrp.workcenter           / resource_id (many2one)        : NEW relation: resource.resource, required
+mrp          / mrp.workcenter           / routing_line_ids (one2many)   : NEW relation: mrp.routing.workcenter
+mrp          / mrp.workcenter           / sequence (integer)            : NEW required, req_default: function, hasdefault
+mrp          / mrp.workcenter           / time_efficiency (float)       : NEW hasdefault, isrelated: related, stored
+mrp          / mrp.workcenter           / time_ids (one2many)           : NEW relation: mrp.workcenter.productivity
+mrp          / mrp.workcenter           / time_start (float)            : NEW
+mrp          / mrp.workcenter           / time_stop (float)             : NEW
+mrp          / mrp.workcenter           / working_state (selection)     : NEW selection_keys: ['blocked', 'done', 'normal'], isfunction: function, stored
+mrp          / mrp.workcenter.productivity / date_end (datetime)           : NEW
+mrp          / mrp.workcenter.productivity / date_start (datetime)         : NEW required, req_default: function, hasdefault
+mrp          / mrp.workcenter.productivity / description (text)            : NEW
+mrp          / mrp.workcenter.productivity / duration (float)              : NEW isfunction: function, stored
+mrp          / mrp.workcenter.productivity / loss_id (many2one)            : NEW relation: mrp.workcenter.productivity.loss, required
+mrp          / mrp.workcenter.productivity / loss_type (selection)         : NEW selection_keys: function, isrelated: related, stored
+mrp          / mrp.workcenter.productivity / user_id (many2one)            : NEW relation: res.users, hasdefault
+mrp          / mrp.workcenter.productivity / workcenter_id (many2one)      : NEW relation: mrp.workcenter, required
+mrp          / mrp.workcenter.productivity / workorder_id (many2one)       : NEW relation: mrp.workorder
 mrp          / mrp.workcenter.productivity.loss / loss_id (many2one)            : NEW relation: mrp.workcenter.productivity.loss.type
-mrp          / mrp.workcenter.productivity.loss / loss_type (selection)         : now related
-mrp          / mrp.workcenter.productivity.loss / loss_type (selection)         : selection_keys is now 'function' ('['availability', 'performance', 'productive', 'quality']')
+mrp          / mrp.workcenter.productivity.loss / loss_type (selection)         : NEW selection_keys: function, isrelated: related, stored
+mrp          / mrp.workcenter.productivity.loss / manual (boolean)              : NEW hasdefault
+mrp          / mrp.workcenter.productivity.loss / name (char)                   : NEW required
+mrp          / mrp.workcenter.productivity.loss / sequence (integer)            : NEW hasdefault
 mrp          / mrp.workcenter.productivity.loss.type / loss_type (selection)         : NEW required, selection_keys: ['availability', 'performance', 'productive', 'quality'], req_default: function, hasdefault
-mrp          / mrp.workorder            / message_last_post (datetime)  : DEL
+mrp          / mrp.workorder            / active_move_line_ids (one2many): NEW relation: stock.move.line
+mrp          / mrp.workorder            / capacity (float)              : NEW hasdefault
+mrp          / mrp.workorder            / date_finished (datetime)      : NEW
+mrp          / mrp.workorder            / date_planned_finished (datetime): NEW
+mrp          / mrp.workorder            / date_planned_start (datetime) : NEW
+mrp          / mrp.workorder            / date_start (datetime)         : NEW
+mrp          / mrp.workorder            / duration (float)              : NEW isfunction: function, stored
+mrp          / mrp.workorder            / duration_expected (float)     : NEW
+mrp          / mrp.workorder            / duration_percent (integer)    : NEW isfunction: function, stored
+mrp          / mrp.workorder            / duration_unit (float)         : NEW isfunction: function, stored
+mrp          / mrp.workorder            / final_lot_id (many2one)       : NEW relation: stock.production.lot
+mrp          / mrp.workorder            / message_follower_ids (one2many): NEW relation: mail.followers
+mrp          / mrp.workorder            / message_ids (one2many)        : NEW relation: mail.message
 mrp          / mrp.workorder            / message_main_attachment_id (many2one): NEW relation: ir.attachment
-mrp          / mrp.workorder            / product_uom_id (many2one)     : relation is now 'uom.uom' ('product.uom') [nothing to do]
-mrp          / procurement.rule         / action (False)                : selection_keys is now '['manufacture', 'pull', 'pull_push', 'push']' ('['manufacture', 'move']')
+mrp          / mrp.workorder            / move_line_ids (one2many)      : NEW relation: stock.move.line
+mrp          / mrp.workorder            / move_raw_ids (one2many)       : NEW relation: stock.move
+mrp          / mrp.workorder            / name (char)                   : NEW required
+mrp          / mrp.workorder            / next_work_order_id (many2one) : NEW relation: mrp.workorder
+mrp          / mrp.workorder            / operation_id (many2one)       : NEW relation: mrp.routing.workcenter
+mrp          / mrp.workorder            / product_id (many2one)         : NEW relation: product.product, isrelated: related, stored
+mrp          / mrp.workorder            / production_availability (selection): NEW selection_keys: function, isrelated: related, stored
+mrp          / mrp.workorder            / production_date (datetime)    : NEW isrelated: related, stored
+mrp          / mrp.workorder            / production_id (many2one)      : NEW relation: mrp.production, required
+mrp          / mrp.workorder            / qty_produced (float)          : NEW hasdefault
+mrp          / mrp.workorder            / qty_producing (float)         : NEW hasdefault
+mrp          / mrp.workorder            / scrap_ids (one2many)          : NEW relation: stock.scrap
+mrp          / mrp.workorder            / state (selection)             : NEW selection_keys: ['cancel', 'done', 'pending', 'progress', 'ready'], hasdefault
+mrp          / mrp.workorder            / time_ids (one2many)           : NEW relation: mrp.workcenter.productivity
+mrp          / mrp.workorder            / website_message_ids (one2many): NEW relation: mail.message
+mrp          / mrp.workorder            / workcenter_id (many2one)      : NEW relation: mrp.workcenter, required
+mrp          / procurement.rule         / action (False)                : previously in module purchase
 mrp          / product.product          / bom_line_ids (one2many)       : NEW relation: mrp.bom.line
 mrp          / product.product          / variant_bom_ids (one2many)    : NEW relation: mrp.bom
+mrp          / product.template         / bom_ids (one2many)            : NEW relation: mrp.bom
 mrp          / product.template         / bom_line_ids (one2many)       : NEW relation: mrp.bom.line
-mrp          / stock.warehouse          / manufacture_pull_id (many2one): relation is now 'stock.rule' ('procurement.rule') [nothing to do]
+mrp          / product.template         / produce_delay (float)         : NEW hasdefault
+mrp          / res.company              / manufacturing_lead (float)    : NEW required, req_default: function, hasdefault
+mrp          / stock.move               / active_move_line_ids (one2many): NEW relation: stock.move.line
+mrp          / stock.move               / bom_line_id (many2one)        : NEW relation: mrp.bom.line
+mrp          / stock.move               / consume_unbuild_id (many2one) : NEW relation: mrp.unbuild
+mrp          / stock.move               / created_production_id (many2one): NEW relation: mrp.production
+mrp          / stock.move               / is_done (boolean)             : NEW isfunction: function, stored
+mrp          / stock.move               / operation_id (many2one)       : NEW relation: mrp.routing.workcenter
+mrp          / stock.move               / production_id (many2one)      : NEW relation: mrp.production
+mrp          / stock.move               / raw_material_production_id (many2one): NEW relation: mrp.production
+mrp          / stock.move               / unbuild_id (many2one)         : NEW relation: mrp.unbuild
+mrp          / stock.move               / unit_factor (float)           : NEW
+mrp          / stock.move               / workorder_id (many2one)       : NEW relation: mrp.workorder
+mrp          / stock.move.line          / done_move (boolean)           : NEW isrelated: related, stored
+mrp          / stock.move.line          / done_wo (boolean)             : NEW hasdefault
+mrp          / stock.move.line          / lot_produced_id (many2one)    : NEW relation: stock.production.lot
+mrp          / stock.move.line          / lot_produced_qty (float)      : NEW
+mrp          / stock.move.line          / production_id (many2one)      : NEW relation: mrp.production
+mrp          / stock.move.line          / workorder_id (many2one)       : NEW relation: mrp.workorder
+mrp          / stock.picking.type       / code (False)                  : NEW selection_keys: ['incoming', 'internal', 'mrp_operation', 'outgoing'], mode: modify
+mrp          / stock.production.lot     / use_next_on_work_order_id (many2one): NEW relation: mrp.workorder
+mrp          / stock.scrap              / production_id (many2one)      : NEW relation: mrp.production
+mrp          / stock.scrap              / workorder_id (many2one)       : NEW relation: mrp.workorder
+mrp          / stock.warehouse          / manu_type_id (many2one)       : NEW relation: stock.picking.type
+mrp          / stock.warehouse          / manufacture_pull_id (many2one): NEW relation: stock.rule
 mrp          / stock.warehouse          / manufacture_steps (selection) : NEW required, selection_keys: ['mrp_one_step', 'pbm', 'pbm_sam'], req_default: function, hasdefault
+mrp          / stock.warehouse          / manufacture_to_resupply (boolean): NEW hasdefault
 mrp          / stock.warehouse          / pbm_loc_id (many2one)         : NEW relation: stock.location
 mrp          / stock.warehouse          / pbm_mto_pull_id (many2one)    : NEW relation: stock.rule
 mrp          / stock.warehouse          / pbm_route_id (many2one)       : NEW relation: stock.location.route
@@ -53,63 +220,235 @@ mrp          / stock.warehouse          / sam_loc_id (many2one)         : NEW re
 mrp          / stock.warehouse          / sam_rule_id (many2one)        : NEW relation: stock.rule
 mrp          / stock.warehouse          / sam_type_id (many2one)        : NEW relation: stock.picking.type
 ---XML records in module 'mrp'---
+NEW ir.actions.act_window: mrp.act_mrp_block_workcenter
+NEW ir.actions.act_window: mrp.act_mrp_block_workcenter_wo
+NEW ir.actions.act_window: mrp.act_mrp_product_produce
+NEW ir.actions.act_window: mrp.act_product_mrp_production
+NEW ir.actions.act_window: mrp.act_product_mrp_production_workcenter
+NEW ir.actions.act_window: mrp.action_change_production_qty
+NEW ir.actions.act_window: mrp.action_mrp_configuration
+NEW ir.actions.act_window: mrp.action_mrp_production_form
+NEW ir.actions.act_window: mrp.action_mrp_production_moves
+NEW ir.actions.act_window: mrp.action_mrp_routing_time
 NEW ir.actions.act_window: mrp.action_mrp_unbuild_move_line
+NEW ir.actions.act_window: mrp.action_mrp_unbuild_moves
+NEW ir.actions.act_window: mrp.action_mrp_workcenter_load_report_graph
+NEW ir.actions.act_window: mrp.action_mrp_workorder_production
+NEW ir.actions.act_window: mrp.action_mrp_workorder_production_specific
+NEW ir.actions.act_window: mrp.action_mrp_workorder_workcenter
+NEW ir.actions.act_window: mrp.action_work_orders
+NEW ir.actions.act_window: mrp.mrp_bom_form_action
 NEW ir.actions.act_window: mrp.mrp_product_variant_action
-DEL ir.actions.act_window: mrp.mrp_message_action_main
-DEL ir.actions.act_window: mrp.mrp_production_action_planning
-DEL ir.actions.act_window: mrp.mrp_production_action_waiting
+NEW ir.actions.act_window: mrp.mrp_production_action
+NEW ir.actions.act_window: mrp.mrp_production_action_picking_deshboard
+NEW ir.actions.act_window: mrp.mrp_production_report
+NEW ir.actions.act_window: mrp.mrp_routing_action
+NEW ir.actions.act_window: mrp.mrp_unbuild
+NEW ir.actions.act_window: mrp.mrp_workcenter_action
+NEW ir.actions.act_window: mrp.mrp_workcenter_kanban_action
+NEW ir.actions.act_window: mrp.mrp_workcenter_productivity_loss_action
+NEW ir.actions.act_window: mrp.mrp_workcenter_productivity_report
+NEW ir.actions.act_window: mrp.mrp_workcenter_productivity_report_blocked
+NEW ir.actions.act_window: mrp.mrp_workcenter_productivity_report_oee
+NEW ir.actions.act_window: mrp.mrp_workorder_delta_report
+NEW ir.actions.act_window: mrp.mrp_workorder_report
+NEW ir.actions.act_window: mrp.mrp_workorder_todo
+NEW ir.actions.act_window: mrp.mrp_workorder_workcenter_report
+NEW ir.actions.act_window: mrp.product_open_bom
+NEW ir.actions.act_window: mrp.product_template_action
+NEW ir.actions.act_window: mrp.template_open_bom
+NEW ir.actions.act_window.view: mrp.action_mrp_workcenter_load_report_pivot
 NEW ir.actions.client: mrp.action_report_mrp_bom
+NEW ir.actions.report: mrp.action_report_bom_structure
 NEW ir.actions.report: mrp.action_report_finished_product
-DEL ir.actions.report: mrp.action_report_bom_price
+NEW ir.actions.report: mrp.action_report_production_order
+NEW ir.actions.server: mrp.production_order_server_action
+NEW ir.model.access: mrp.access_mrp_bom
+NEW ir.model.access: mrp.access_mrp_bom_line
+NEW ir.model.access: mrp.access_mrp_bom_line_manager
+NEW ir.model.access: mrp.access_mrp_bom_line_stockuser
+NEW ir.model.access: mrp.access_mrp_bom_manager
+NEW ir.model.access: mrp.access_mrp_bom_stockuser
+NEW ir.model.access: mrp.access_mrp_document_mrp_manager
+NEW ir.model.access: mrp.access_mrp_document_mrp_user
+NEW ir.model.access: mrp.access_mrp_production
+NEW ir.model.access: mrp.access_mrp_production_manager
+NEW ir.model.access: mrp.access_mrp_production_stock_worker
+NEW ir.model.access: mrp.access_mrp_resource_manager
+NEW ir.model.access: mrp.access_mrp_routing
+NEW ir.model.access: mrp.access_mrp_routing_manager
+NEW ir.model.access: mrp.access_mrp_routing_workcenter
+NEW ir.model.access: mrp.access_mrp_routing_workcenter_manager
+NEW ir.model.access: mrp.access_mrp_unbuild
+NEW ir.model.access: mrp.access_mrp_unbuild_manager
+NEW ir.model.access: mrp.access_mrp_workcenter
+NEW ir.model.access: mrp.access_mrp_workcenter_manager
+NEW ir.model.access: mrp.access_mrp_workcenter_productivity
+NEW ir.model.access: mrp.access_mrp_workcenter_productivity_loss
+NEW ir.model.access: mrp.access_mrp_workcenter_productivity_loss_manager
 NEW ir.model.access: mrp.access_mrp_workcenter_productivity_loss_type
+NEW ir.model.access: mrp.access_mrp_workorder_mrp_manager
+NEW ir.model.access: mrp.access_mrp_workorder_mrp_user
+NEW ir.model.access: mrp.access_product_category_mrp_manager
+NEW ir.model.access: mrp.access_product_group_res_partner_mrp_manager
+NEW ir.model.access: mrp.access_product_packaging_mrp_manager
+NEW ir.model.access: mrp.access_product_price_history_mrp_manager
+NEW ir.model.access: mrp.access_product_pricelist_item_mrp_manager
+NEW ir.model.access: mrp.access_product_pricelist_mrp_manager
+NEW ir.model.access: mrp.access_product_product_mrp_manager
+NEW ir.model.access: mrp.access_product_product_user
+NEW ir.model.access: mrp.access_product_supplierinfo_manager
+NEW ir.model.access: mrp.access_product_supplierinfo_user
+NEW ir.model.access: mrp.access_product_template_mrp_manager
+NEW ir.model.access: mrp.access_product_template_user
+NEW ir.model.access: mrp.access_res_partner
+NEW ir.model.access: mrp.access_resource_calendar_attendance_manager
+NEW ir.model.access: mrp.access_resource_calendar_attendance_mrp_user
+NEW ir.model.access: mrp.access_resource_calendar_leaves_manager
+NEW ir.model.access: mrp.access_resource_calendar_leaves_user
+NEW ir.model.access: mrp.access_resource_calendar_manufacturinguser
+NEW ir.model.access: mrp.access_resource_resource
+NEW ir.model.access: mrp.access_resource_resource_manager
+NEW ir.model.access: mrp.access_stock_location_mrp_worker
+NEW ir.model.access: mrp.access_stock_move_mrp_manager
+NEW ir.model.access: mrp.access_stock_move_mrp_worker
+NEW ir.model.access: mrp.access_stock_picking_mrp_manager
+NEW ir.model.access: mrp.access_stock_picking_mrp_worker
+NEW ir.model.access: mrp.access_stock_production_lot_user
+NEW ir.model.access: mrp.access_stock_warehouse
+NEW ir.model.access: mrp.access_stock_warehouse_orderpoint_user
 NEW ir.model.access: mrp.access_uom_category
 NEW ir.model.access: mrp.access_uom_category_mrp_manager
 NEW ir.model.access: mrp.access_uom_uom_mrp_manager
 NEW ir.model.access: mrp.access_uom_uom_user
-DEL ir.model.access: mrp.access_mrp_message_mrp_manager
-DEL ir.model.access: mrp.access_mrp_message_mrp_user
-DEL ir.model.access: mrp.access_product_puom_categ
-DEL ir.model.access: mrp.access_product_uom_categ_mrp_manager
-DEL ir.model.access: mrp.access_product_uom_mrp_manager
-DEL ir.model.access: mrp.access_product_uom_user
-DEL ir.sequence: mrp.sequence_mrp_prod (noupdate)
+NEW ir.rule: mrp.mrp_bom_rule (noupdate)
+NEW ir.rule: mrp.mrp_production_rule (noupdate)
+NEW ir.rule: mrp.mrp_routing_rule (noupdate)
+NEW ir.rule: mrp.mrp_routing_workcenter_rule (noupdate)
+NEW ir.rule: mrp.mrp_workcenter_rule (noupdate)
+NEW ir.sequence: mrp.sequence_mrp_route (noupdate)
+NEW ir.sequence: mrp.sequence_mrp_unbuild (noupdate)
+NEW ir.ui.menu: mrp.menu_mrp_bom
+NEW ir.ui.menu: mrp.menu_mrp_bom_form_action
+NEW ir.ui.menu: mrp.menu_mrp_config
+NEW ir.ui.menu: mrp.menu_mrp_configuration
+NEW ir.ui.menu: mrp.menu_mrp_dashboard
+NEW ir.ui.menu: mrp.menu_mrp_manufacturing
+NEW ir.ui.menu: mrp.menu_mrp_product_form
+NEW ir.ui.menu: mrp.menu_mrp_production_action
+NEW ir.ui.menu: mrp.menu_mrp_production_report
+NEW ir.ui.menu: mrp.menu_mrp_reporting
+NEW ir.ui.menu: mrp.menu_mrp_root
+NEW ir.ui.menu: mrp.menu_mrp_routing_action
+NEW ir.ui.menu: mrp.menu_mrp_scrap
+NEW ir.ui.menu: mrp.menu_mrp_traceability
+NEW ir.ui.menu: mrp.menu_mrp_unbuild
+NEW ir.ui.menu: mrp.menu_mrp_work_order_report
+NEW ir.ui.menu: mrp.menu_mrp_workcenter_productivity_loss
+NEW ir.ui.menu: mrp.menu_mrp_workcenter_productivity_report
+NEW ir.ui.menu: mrp.menu_mrp_workorder_todo
+NEW ir.ui.menu: mrp.menu_view_resource_calendar_search_mrp
+NEW ir.ui.menu: mrp.menu_view_resource_search_mrp
+NEW ir.ui.menu: mrp.mrp_planning_menu_root
 NEW ir.ui.menu: mrp.product_variant_mrp
-DEL ir.ui.menu: mrp.menu_pm_resources_config
-DEL ir.ui.menu: mrp.menu_view_resource_calendar_leaves_search_mrp
-DEL ir.ui.menu: mrp.mrp_message_menu
+NEW ir.ui.view: mrp.assets_backend
 NEW ir.ui.view: mrp.assets_common
 NEW ir.ui.view: mrp.exception_on_mo
 NEW ir.ui.view: mrp.label_production_view_pdf
+NEW ir.ui.view: mrp.mrp_bom_form_view
+NEW ir.ui.view: mrp.mrp_bom_kanban_view
+NEW ir.ui.view: mrp.mrp_bom_line_view_form
+NEW ir.ui.view: mrp.mrp_bom_tree_view
 NEW ir.ui.view: mrp.mrp_product_product_search_view
 NEW ir.ui.view: mrp.mrp_product_template_search_view
+NEW ir.ui.view: mrp.mrp_production_form_view
+NEW ir.ui.view: mrp.mrp_production_kanban_view
+NEW ir.ui.view: mrp.mrp_production_tree_view
 NEW ir.ui.view: mrp.mrp_production_workorder_form_view_inherit
 NEW ir.ui.view: mrp.mrp_production_workorder_tree_view_inherit
 NEW ir.ui.view: mrp.mrp_report_stock_rule
+NEW ir.ui.view: mrp.mrp_routing_form_view
+NEW ir.ui.view: mrp.mrp_routing_kanban_view
+NEW ir.ui.view: mrp.mrp_routing_search_view
+NEW ir.ui.view: mrp.mrp_routing_tree_view
+NEW ir.ui.view: mrp.mrp_routing_workcenter_form_view
+NEW ir.ui.view: mrp.mrp_routing_workcenter_tree_view
+NEW ir.ui.view: mrp.mrp_unbuild_form_view
+NEW ir.ui.view: mrp.mrp_unbuild_kanban_view
+NEW ir.ui.view: mrp.mrp_unbuild_search_view
+NEW ir.ui.view: mrp.mrp_unbuild_tree_view
+NEW ir.ui.view: mrp.mrp_workcenter_block_wizard_form
+NEW ir.ui.view: mrp.mrp_workcenter_kanban
+NEW ir.ui.view: mrp.mrp_workcenter_tree_view
+NEW ir.ui.view: mrp.mrp_workcenter_view
+NEW ir.ui.view: mrp.mrp_workcenter_view_kanban
+NEW ir.ui.view: mrp.mrp_workorder_view_gantt
+NEW ir.ui.view: mrp.oee_form_view
+NEW ir.ui.view: mrp.oee_graph_view
+NEW ir.ui.view: mrp.oee_loss_form_view
+NEW ir.ui.view: mrp.oee_loss_search_view
+NEW ir.ui.view: mrp.oee_loss_tree_view
+NEW ir.ui.view: mrp.oee_pie_view
+NEW ir.ui.view: mrp.oee_pivot_view
+NEW ir.ui.view: mrp.oee_search_view
+NEW ir.ui.view: mrp.oee_tree_view
+NEW ir.ui.view: mrp.product_product_form_view_bom_button
+NEW ir.ui.view: mrp.product_template_form_view_bom_button
+NEW ir.ui.view: mrp.production_message
+NEW ir.ui.view: mrp.qunit_suite
 NEW ir.ui.view: mrp.report_bom_structure
 NEW ir.ui.view: mrp.report_mrp_bom
 NEW ir.ui.view: mrp.report_mrp_bom_line
 NEW ir.ui.view: mrp.report_mrp_bom_pdf
 NEW ir.ui.view: mrp.report_mrp_bom_pdf_line
 NEW ir.ui.view: mrp.report_mrp_operation_line
+NEW ir.ui.view: mrp.report_mrporder
+NEW ir.ui.view: mrp.res_config_settings_view_form
+NEW ir.ui.view: mrp.stock_production_type_kanban
+NEW ir.ui.view: mrp.stock_scrap_view_form2_mrp_inherit_mrp
+NEW ir.ui.view: mrp.stock_scrap_view_form_mrp_inherit_mrp
+NEW ir.ui.view: mrp.stock_warn_insufficient_qty_unbuild_form_view
+NEW ir.ui.view: mrp.track_production_move_template
+NEW ir.ui.view: mrp.view_change_production_qty_wizard
+NEW ir.ui.view: mrp.view_document_file_kanban_mrp
+NEW ir.ui.view: mrp.view_document_form
+NEW ir.ui.view: mrp.view_finisehd_move_line
+NEW ir.ui.view: mrp.view_mrp_bom_filter
+NEW ir.ui.view: mrp.view_mrp_product_produce_wizard
+NEW ir.ui.view: mrp.view_mrp_product_template_form_inherited
+NEW ir.ui.view: mrp.view_mrp_production_filter
+NEW ir.ui.view: mrp.view_mrp_production_work_order_search
 NEW ir.ui.view: mrp.view_mrp_production_workorder_form_view_filter
+NEW ir.ui.view: mrp.view_mrp_workcenter_productivity_loss_kanban
+NEW ir.ui.view: mrp.view_mrp_workcenter_search
+NEW ir.ui.view: mrp.view_picking_type_form_inherit_mrp
+NEW ir.ui.view: mrp.view_production_calendar
+NEW ir.ui.view: mrp.view_production_gantt
+NEW ir.ui.view: mrp.view_production_graph
+NEW ir.ui.view: mrp.view_production_pivot
+NEW ir.ui.view: mrp.view_stock_move_lots
 NEW ir.ui.view: mrp.view_warehouse_inherit_mrp
-DEL ir.ui.view: mrp.mrp_bom_component_tree_view
-DEL ir.ui.view: mrp.mrp_bom_cost_report
-DEL ir.ui.view: mrp.mrp_bom_structure_report
-DEL ir.ui.view: mrp.mrp_message_view_form
-DEL ir.ui.view: mrp.mrp_message_view_form_embedded_bom
-DEL ir.ui.view: mrp.mrp_message_view_form_embedded_product
-DEL ir.ui.view: mrp.mrp_message_view_search
-DEL ir.ui.view: mrp.mrp_message_view_tree
-DEL ir.ui.view: mrp.mrp_production_workcenter_form_view_inherit
-DEL ir.ui.view: mrp.mrp_production_workcenter_tree_view_inherit
-DEL ir.ui.view: mrp.product_template_search_view_procurment
-DEL ir.ui.view: mrp.view_mrp_bom_line_filter
-DEL ir.ui.view: mrp.view_mrp_message_kanban
-DEL ir.ui.view: mrp.view_mrp_production_workcenter_form_view_filter
-DEL ir.ui.view: mrp.view_procurement_rule_form_stock_inherit_mrp
-DEL ir.ui.view: mrp.view_warehouse_inherited
+NEW ir.ui.view: mrp.view_work_center_load_graph
+NEW ir.ui.view: mrp.view_workcenter_load_pivot
+NEW ir.ui.view: mrp.workcenter_line_calendar
+NEW ir.ui.view: mrp.workcenter_line_gantt_production
+NEW ir.ui.view: mrp.workcenter_line_graph
+NEW ir.ui.view: mrp.workcenter_line_kanban
+NEW ir.ui.view: mrp.workcenter_line_pivot
+NEW mrp.workcenter.productivity.loss: mrp.block_reason0 (noupdate)
+NEW mrp.workcenter.productivity.loss: mrp.block_reason1 (noupdate)
+NEW mrp.workcenter.productivity.loss: mrp.block_reason2 (noupdate)
+NEW mrp.workcenter.productivity.loss: mrp.block_reason4 (noupdate)
+NEW mrp.workcenter.productivity.loss: mrp.block_reason5 (noupdate)
+NEW mrp.workcenter.productivity.loss: mrp.block_reason6 (noupdate)
+NEW mrp.workcenter.productivity.loss: mrp.block_reason7 (noupdate)
 NEW mrp.workcenter.productivity.loss.type: mrp.category_availability (noupdate)
 NEW mrp.workcenter.productivity.loss.type: mrp.category_performance (noupdate)
 NEW mrp.workcenter.productivity.loss.type: mrp.category_productive (noupdate)
 NEW mrp.workcenter.productivity.loss.type: mrp.category_quality (noupdate)
+NEW res.groups: mrp.group_mrp_manager
+NEW res.groups: mrp.group_mrp_routings
+NEW res.groups: mrp.group_mrp_user
+NEW res.users: base.default_user (noupdate)
+NEW stock.location.route: mrp.route_warehouse0_manufacture (noupdate)
+NEW stock.warehouse: stock.warehouse0 (noupdate)

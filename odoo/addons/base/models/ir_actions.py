@@ -289,8 +289,8 @@ class IrActionsActWindowView(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         res = super(IrActionsActWindowView, self)._auto_init()
-        tools.create_unique_index(self._cr, 'act_window_view_unique_mode_per_action',
-                                  self._table, ['act_window_id', 'view_mode'])
+        # tools.create_unique_index(self._cr, 'act_window_view_unique_mode_per_action',
+        #                           self._table, ['act_window_id', 'view_mode'])
         return res
 
 

@@ -46,4 +46,4 @@ NEW report.layout: web.report_layout_background
 NEW report.layout: web.report_layout_boxed
 NEW report.layout: web.report_layout_clean
 NEW report.layout: web.report_layout_standard
-NEW res.company: base.main_company [potentially moved from project module] (noupdate)
+NEW res.company: base.main_company (noupdate)
